@@ -60,33 +60,23 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
 //TASK: FIN Implement ik_solve using screws.
 Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd &j0, const std::function<uint32_t(const std::vector<Eigen::VectorXd> &)> &solution_selector)
 {
-    // Maks antall iterasjoner
     const int MAX_ITER = 20;
 
-    // Konstanter for feiltoleranse
-    const double WE_TOL = m_we; // Angular feiltoleranse
-    const double VE_TOL = m_ve; // Lineær feiltoleranse
+    const double WE_TOL = m_we;
+    const double VE_TOL = m_ve;
 
     Eigen::VectorXd current_joints = j0;
 
     for (int iter = 0; iter < MAX_ITER; ++iter)
     {
-        // 1. Beregn gjeldende pose (T_sb)
         Eigen::Matrix4d T_sb = fk_solve(current_joints);
-
-        // 2. Beregn feiltransformasjonen (T_bd)
-        // T_bd = T_sb^-1 * T_sd
         Eigen::Matrix4d T_bs = T_sb.inverse();
         Eigen::Matrix4d T_bd = T_bs * t_sd;
-
-        // 3. Beregn Feil Twist (V_e)
         auto log_T_pair = utility::matrix_logarithm(T_bd);
         Eigen::VectorXd S_e = log_T_pair.first;
         double theta_e = log_T_pair.second;
 
         Eigen::VectorXd V_e = S_e * theta_e;
-
-        // 4. Sjekk for konvergens
         double w_error = V_e.head<3>().norm();
         double v_error = V_e.tail<3>().norm();
 
@@ -94,33 +84,14 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
         {
             return current_joints;
         }
-
-        // 5. Beregn Body Jacobian (Jb)
         Eigen::MatrixXd Jb = body_jacobian(current_joints);
-
-        // 6. Beregn Pseudo-Invers (Jb^dagger) ved bruk av SVD
-        // ---------------------------------------------------------
-        // FIX START
         Eigen::JacobiSVD<Eigen::MatrixXd> svd(Jb, Eigen::ComputeThinU | Eigen::ComputeThinV);
         Eigen::VectorXd singular_values = svd.singularValues();
-
-        // Beregn toleranse basert på maskin-presisjon og største singulærverdi
         double tolerance = std::numeric_limits<double>::epsilon() * std::max(Jb.rows(), Jb.cols()) * singular_values.array().abs().maxCoeff();
-
-        // VIKTIG ENDRING:
-        // Vi bruker .select() for å sjekke ORIGINAL verdi mot toleranse.
-        // Hvis (verdi > toleranse) -> Inverter verdien (1/x).
-        // Hvis (verdi <= toleranse) -> Sett til 0.0 (demp singulæriteten).
         Eigen::VectorXd singular_values_inv = (singular_values.array() > tolerance).select(singular_values.array().inverse(), 0.0);
 
         Eigen::MatrixXd Jb_dagger = svd.matrixV() * singular_values_inv.asDiagonal() * svd.matrixU().transpose();
-        // FIX SLUTT
-        // ---------------------------------------------------------
-
-        // 7. Beregn leddforflytningen (Delta_theta)
         Eigen::VectorXd Delta_theta = Jb_dagger * V_e;
-
-        // 8. Oppdater leddvinklene
         current_joints += Delta_theta;
     }
 
@@ -137,34 +108,18 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
 //TASK: FIN Implement body_chain(). You can obtain the variables to transform to body frame from space_chain().
 std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver::body_chain()
 {
-    // 1. Hent Space Chain parametere: {M_space, S_space}
     auto [M_space, S_space] = space_chain();
-
-    // 2. Beregn M i Body Frame: M_body = M_space^-1
     Eigen::Matrix4d M_body = M_space.inverse();
-
-    // 3. Beregn Adjoint Matrisen for transformasjonen T = M_body
-    // Dette er Ad(M^-1)
-    // Antar at adjoint_matrix(const Eigen::Matrix4d &tf) er tilgjengelig.
-    Eigen::MatrixXd Ad_M_inv = utility::adjoint_matrix(M_body); // Bruker M_body = M_space^-1
-
-    // 4. Transformere hver Space Screw (Si) til Body Screw (Bi)
+    Eigen::MatrixXd Ad_M_inv = utility::adjoint_matrix(M_body);
     std::vector<Eigen::VectorXd> B_body;
     B_body.reserve(S_space.size());
 
     for (const auto& S_i : S_space)
     {
-        // Bi = Ad_M_inv * Si
-        // Antar at adjoint_map() er tilgjengelig, men vi bruker Ad_M_inv direkte
         Eigen::VectorXd B_i = Ad_M_inv * S_i;
         B_body.push_back(B_i);
     }
-
-    // 5. Returner {M_body, B_body}
     return {M_body, B_body};
-
-    // auto [m, screws] = space_chain();
-    //return space_chain();
 }
 
 //TASK: FIN Implement space_jacobian() using space_chain()
@@ -191,32 +146,15 @@ Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &cu
     }
 
     return Js;
-    //return Eigen::MatrixXd::Identity(current_joint_positions.size(), current_joint_positions.size());
 }
 
 //TASK: FIN Implement body_jacobian() using body_chain()
 Eigen::MatrixXd ScrewsKinematicsSolver::body_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
-        // 1. Beregn Space Jacobian (Js)
-        // Js = space_jacobian(theta)
         Eigen::MatrixXd Js = space_jacobian(current_joint_positions);
-
-        // 2. Beregn den totale transformasjonen T_sb (Space til Body)
-        // T_sb = fk_solve(theta)
         Eigen::Matrix4d T_sb = fk_solve(current_joint_positions);
-
-        // 3. Beregn T_sb inverse: T_bs (Body til Space)
         Eigen::Matrix4d T_bs = T_sb.inverse();
-
-        // 4. Beregn Adjoint Matrisen for T_bs
-        // Ad_T_bs = Ad(T_sb^-1). Dette er nødvendig for å transformere Js til Jb.
-        // Antar at adjoint_matrix(const Eigen::Matrix4d &tf) er tilgjengelig.
         Eigen::MatrixXd Ad_T_bs = utility::adjoint_matrix(T_bs);
-
-        // 5. Transformer Space Jacobian til Body Jacobian: Jb = Ad_T_bs * Js
         Eigen::MatrixXd Jb = Ad_T_bs * Js;
-
-        // Body Jacobian har 6 rader (Twist) og N kolonner (ledd), noe som er sikret her (6 x N).
         return Jb;
-    //return Eigen::MatrixXd::Identity(current_joint_positions.size(), current_joint_positions.size());
 }
