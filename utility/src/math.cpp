@@ -125,7 +125,7 @@ namespace AIS4104::utility {
         S << w, v;
         return S;
     }
-
+    // Referanse:DIGITAL MR formula on page 102
     Eigen::VectorXd screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
     {
         Eigen::VectorXd S(6);
@@ -176,7 +176,7 @@ namespace AIS4104::utility {
             }
             else {
                 theta = acos(0.5 * (trace_r - 1));
-                double w_n = 1 / 2*sin(theta);
+                double w_n = 1 / (2*sin(theta));
 
                 double w_1 = w_n * (r(2, 1) - r(1, 2));
                 double w_2 = w_n * (r(0, 2) - r(2, 0));

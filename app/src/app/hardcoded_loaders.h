@@ -74,16 +74,77 @@ inline std::shared_ptr<TracIkKinematicsSolver> hardcoded_ur3e_tracik_solver()
     return std::make_shared<TracIkKinematicsSolver>(c, limits);
 }
 
-//TASK: Kinematic modeling of the KUKA KR 6 r900 sixx using screws.
+//TASK: FIN Kinematic modeling of the KUKA KR 6 r900 sixx using screws.
 inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
 {
-    return hardcoded_ur3e_screw_solver();
+    //These are in meters
+    double l1 = 0.025;
+    double l2 = 0.455;
+    double l3 = 0.420;
+    double l4 = 0.080;
+    double h1 = 0.200;
+    double h2 = 0.200;
+    double h3 = 0.035;
+
+    Eigen::Matrix4d m = utility::transformation_matrix(utility::rotate_y(0 * utility::deg_to_rad) * utility::rotate_x(0 * utility::deg_to_rad) * utility::rotate_z(0 * utility::deg_to_rad),
+        Eigen::Vector3d{l1 + l2 + l3 + l4 , 0.0, h1 + h2 + h3 });
+
+    Simulation::JointLimits limits
+    {
+        utility::to_eigen_vectord(std::vector<double>{180.0, 180.0, 180.0, 360.0, 360.0, 360.0}) * utility::deg_to_rad,
+        utility::to_eigen_vectord(std::vector<double>{90.0, 90.0, 90.0, 180.0, 180.0, 180.0}) * utility::deg_to_rad,
+        utility::to_eigen_vectord(std::vector<double>{-170.0, -190.0, -120.0, -185.0, -120.0, -350.0}) * utility::deg_to_rad,
+        utility::to_eigen_vectord(std::vector<double>{170.0, 45.0, 156.0, 185.0, 120.0, 350.0}) * utility::deg_to_rad
+    };
+
+    return std::make_shared<ScrewsKinematicsSolver>(
+        m,
+        std::vector<Eigen::VectorXd>{
+            utility::screw_axis({0.0, 0.0, h1}, {0.0, 0.0, 1.0}, 0.0),
+            utility::screw_axis({l1, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1+ h2}, {1.0, 0.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2 + l3, 0.0, h1+ h2 + h3}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2 + l3 + l4, 0.0, h1+ h2 + h3}, {1.0, 0.0, 0.0}, 0.0)
+        }, limits
+    );
+
+    //return hardcoded_ur3e_screw_solver();
 }
 
-//TASK: Kinematic modeling of the KUKA KR 6 r900 sixx using Trac IK and KDL.
+//TASK: FIN Kinematic modeling of the KUKA KR 6 r900 sixx using Trac IK and KDL.
 inline std::shared_ptr<TracIkKinematicsSolver> hardcoded_kr6r_tracik_solver()
 {
-    return hardcoded_ur3e_tracik_solver();
+
+    //These are in meters
+    double l1 = 0.025;
+    double l2 = 0.455;
+    double l3 = 0.420;
+    double l4 = 0.080;
+    double h1 = 0.200;
+    double h2 = 0.200;
+    double h3 = 0.035;
+
+    auto c = std::make_shared<KDL::Chain>();
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::Fixed), KDL::Frame(KDL::Vector(0.0, 0.0, h1))));
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotZ), KDL::Frame(KDL::Vector(l1, 0.0, h2))));
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotY), KDL::Frame(KDL::Vector(l2, 0.0, 0.0))));
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotY), KDL::Frame(KDL::Vector(0.0, 0.0, h3))));
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotX), KDL::Frame(KDL::Vector(0.0, 0.0, 0.0))));
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotY), KDL::Frame(KDL::Vector(l3, 0.0, 0.0))));
+    c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotX), KDL::Frame(KDL::Vector(l4, 0.0, 0.0))));
+
+    Simulation::JointLimits limits
+    {
+        utility::to_eigen_vectord(std::vector<double>{180.0, 180.0, 180.0, 360.0, 360.0, 360.0}) * utility::deg_to_rad,
+        utility::to_eigen_vectord(std::vector<double>{90.0, 90.0, 90.0, 180.0, 180.0, 180.0}) * utility::deg_to_rad,
+        utility::to_eigen_vectord(std::vector<double>{-170.0, -190.0, -120.0, -185.0, -120.0, -350.0}) * utility::deg_to_rad,
+        utility::to_eigen_vectord(std::vector<double>{170.0, 45.0, 156.0, 185.0, 120.0, 350.0}) * utility::deg_to_rad
+    };
+
+    return std::make_shared<TracIkKinematicsSolver>(c, limits);
+
+    //return hardcoded_ur3e_tracik_solver();
 }
 
 }
