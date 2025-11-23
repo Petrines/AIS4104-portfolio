@@ -100,13 +100,13 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
     return std::make_shared<ScrewsKinematicsSolver>(
         m,
         std::vector<Eigen::VectorXd>{
-            utility::screw_axis({0.0, 0.0, h1}, {0.0, 0.0, 1.0}, 0.0),
-            utility::screw_axis({l1, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2, 0.0, h1+ h2}, {1.0, 0.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2 + l3, 0.0, h1+ h2 + h3}, {0.0, 1.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2 + l3 + l4, 0.0, h1+ h2 + h3}, {1.0, 0.0, 0.0}, 0.0)
-        }, limits
+                    utility::screw_axis({0.0, 0.0, h1}, {0.0, 0.0, 1.0}, 0.0),
+                    utility::screw_axis({l1, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+                    utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+                    utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0),
+                    utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {0.0, 1.0, 0.0}, 0.0),
+                    utility::screw_axis({l1 + l2 + l3, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0)
+                }, limits
     );
 
     //return hardcoded_ur3e_screw_solver();
