@@ -24,20 +24,20 @@ inline Visualization::TrajectoryLoggerWindow::State default_logger_state()
 inline Eigen::VectorXd initial_robot_configuration()
 {
     Eigen::VectorXd config(6);
-    config << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+    config << 0.0, -45.0, 90.0, -90.0, -90.0, 60.0;
     return config * utility::deg_to_rad;
 }
 
 //TASK: Default tool configuration:
-// a) Set the default value of the orientation of the 3D model (adapter + humerus) to render correctly on the flange.
-// b) Set the default value of the frame transformation from the flange to the humeral rotation center.
+// a) FIN Set the default value of the orientation of the 3D model (adapter + humerus) to render correctly on the flange.
+// b) (3c) Set the default value of the frame transformation from the flange to the humeral rotation center.
 // (The humerus must face the glenoid for the identity orientation.)
 
 inline Visualization::ToolConfigurationWindow::State default_tool_state()
 {
     return Visualization::ToolConfigurationWindow::State{
         //Activate the default tool 3D model (change to show humerus when app opens).
-        false,
+        true,
         //The default tool 3D model to load
         "models/adapter-humerus.stl",
         //The desired view of the tool config window
@@ -47,7 +47,7 @@ inline Visualization::ToolConfigurationWindow::State default_tool_state()
         //Position of the tool 3D model used in rendering
         Eigen::Vector3f{0.f, 0.f, 0.f},
         //Euler ZYX orientation (IN DEGREES) of the tool 3D model used in rendering
-        Eigen::Vector3f{0.f, 0.f, 0.f},
+        Eigen::Vector3f{0.f, -90.f, 0.f},
         //Tool center point offset used for robot kinematics.
         // Eigen::Vector3f{0.0425f, 0.025f, 0.1525f},
         Eigen::Vector3f{0.f, 0.f, 0.f},
@@ -61,7 +61,7 @@ inline Visualization::WorldObjectConfigurationWindow::State default_world_object
 {
     return Visualization::WorldObjectConfigurationWindow::State{
         //Activate the default world object 3D model (change to show rig when app opens).
-        false,
+        true,
         //The default world object 3D model to load
         "models/humerus-rig.stl",
         Visualization::WorldObjectConfigurationWindow::WorldView::TRANSFORM,
@@ -70,7 +70,7 @@ inline Visualization::WorldObjectConfigurationWindow::State default_world_object
         //Position of the world object 3D model used in rendering
         Eigen::Vector3f{1.015f, 0.f, -0.18f},
         //Euler ZYX orientation (IN DEGREES) of the world object 3D model used in rendering
-        Eigen::Vector3f{0.f, 0.f, 0.f}
+        Eigen::Vector3f{90.f, 90.f, 0.f}
     };
 }
 }

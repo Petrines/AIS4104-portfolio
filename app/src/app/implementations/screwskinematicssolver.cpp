@@ -29,7 +29,7 @@ uint32_t ScrewsKinematicsSolver::joint_count() const
     return m_screws.size();
 }
 
-//TASK: FIN Implement fk_solve using screws.
+//FINISHED: Implement fk_solve using screws.
 Eigen::Matrix4d ScrewsKinematicsSolver::fk_solve(const Eigen::VectorXd &joint_positions)
 {
     auto [M, S] = space_chain();
@@ -57,7 +57,7 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
     return ik_solve(t_sd, j0, [&](const std::vector<Eigen::VectorXd> &) { return 0u; });
 }
 
-//TASK: FIN Implement ik_solve using screws.
+//FINISHED: Implement ik_solve using screws.
 Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd &j0, const std::function<uint32_t(const std::vector<Eigen::VectorXd> &)> &solution_selector)
 {
     const int MAX_ITER = 20;
@@ -105,7 +105,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
     return {m_m, m_screws};
 }
 
-//TASK: FIN Implement body_chain(). You can obtain the variables to transform to body frame from space_chain().
+//FINISHED: Implement body_chain(). You can obtain the variables to transform to body frame from space_chain().
 std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver::body_chain()
 {
     auto [M_space, S_space] = space_chain();
@@ -122,7 +122,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
     return {M_body, B_body};
 }
 
-//TASK: FIN Implement space_jacobian() using space_chain()
+//FINISHED: Implement space_jacobian() using space_chain()
 Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
     auto [M, S] = space_chain();
@@ -148,7 +148,7 @@ Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &cu
     return Js;
 }
 
-//TASK: FIN Implement body_jacobian() using body_chain()
+//FINISHED: Implement body_jacobian() using body_chain()
 Eigen::MatrixXd ScrewsKinematicsSolver::body_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
         Eigen::MatrixXd Js = space_jacobian(current_joint_positions);

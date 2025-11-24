@@ -74,7 +74,7 @@ inline std::shared_ptr<TracIkKinematicsSolver> hardcoded_ur3e_tracik_solver()
     return std::make_shared<TracIkKinematicsSolver>(c, limits);
 }
 
-//TASK: FIN Kinematic modeling of the KUKA KR 6 r900 sixx using screws.
+//FINISHED: Kinematic modeling of the KUKA KR 6 r900 sixx using screws.
 inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
 {
     //These are in meters
@@ -112,7 +112,7 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
     //return hardcoded_ur3e_screw_solver();
 }
 
-//TASK: FIN Kinematic modeling of the KUKA KR 6 r900 sixx using Trac IK and KDL.
+//FINISHED: Kinematic modeling of the KUKA KR 6 r900 sixx using Trac IK and KDL.
 inline std::shared_ptr<TracIkKinematicsSolver> hardcoded_kr6r_tracik_solver()
 {
 
