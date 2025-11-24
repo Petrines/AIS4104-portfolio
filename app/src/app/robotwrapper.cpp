@@ -37,6 +37,9 @@ uint8_t RobotWrapper::joint_count() const
 // b) Use the m_solver.ik_solve() overload with the solution selector lambda to choose the most desirable IK solution.
 Eigen::VectorXd RobotWrapper::ik_solve_pose(const Eigen::Matrix4d &eef_pose, const Eigen::VectorXd &j0) const
 {
+    //Eigen::Matrix4d flange_pose = eef_pose * m_tool_transform.inverse();
+    //return ik_solve_flange_pose(flange_pose,j0);
+
     // a) Konverter fra ønsket Verktøy-pose (eef_pose) til Flens-pose.
     // Vi må "trekke fra" verktøyet ved å gange med inversen av transformasjonen.
     Eigen::Matrix4d flange_pose = eef_pose * m_tool_transform.inverse();
@@ -94,6 +97,7 @@ Eigen::VectorXd RobotWrapper::ik_solve_flange_pose(const Eigen::Matrix4d &flange
     };
 
     return m_solver->ik_solve(solver_target_pose, j0, solution_selector);
+    //return m_solver->ik_solve(flange_pose, j0);
     //return joint_positions();
 }
 

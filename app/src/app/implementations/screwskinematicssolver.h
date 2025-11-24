@@ -23,6 +23,7 @@ public:
     Eigen::MatrixXd space_jacobian(const Eigen::VectorXd &current_joint_positions);
     Eigen::MatrixXd body_jacobian(const Eigen::VectorXd &current_joint_positions);
 
+
 private:
     double m_ve;
     double m_we;

@@ -25,6 +25,7 @@ inline Eigen::VectorXd initial_robot_configuration()
 {
     Eigen::VectorXd config(6);
     config << 0.0, -45.0, 90.0, -90.0, -90.0, 60.0;
+    //config << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     return config * utility::deg_to_rad;
 }
 
@@ -52,7 +53,7 @@ inline Visualization::ToolConfigurationWindow::State default_tool_state()
         Eigen::Vector3f{0.0425f, -0.025f, 0.1525f},
         //Eigen::Vector3f{0.f, 0.f, 0.f},
         //Euler ZYX orientation (IN DEGREES) of the tool center point used for robot kinematics.
-        Eigen::Vector3f{0.f, 0.f, 0.f}
+        Eigen::Vector3f{-90.f, -15.f, 0.f}
     };
 }
 
