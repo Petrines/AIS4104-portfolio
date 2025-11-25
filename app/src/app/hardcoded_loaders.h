@@ -78,17 +78,23 @@ inline std::shared_ptr<TracIkKinematicsSolver> hardcoded_ur3e_tracik_solver()
 inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
 {
     //These are in meters
-    double l1 = 0.025;
+    /*double l1 = 0.025;
     double l2 = 0.455;
     double l3 = 0.420;
     double l4 = 0.080;
     double h1 = 0.200;
     double h2 = 0.200;
-    double h3 = 0.035;
+    double h3 = 0.035;*/
+
+    double l1 = 0.025;
+    double l2 = 0.455;
+    double l3 = 0.420;
+    double l4 = 0.080;
+    double h1 = 0.400;
+    double h2 = 0.035;
 
     Eigen::Matrix4d m = utility::transformation_matrix(utility::rotate_y(0 * utility::deg_to_rad) * utility::rotate_x(0 * utility::deg_to_rad) * utility::rotate_z(0 * utility::deg_to_rad),
-        Eigen::Vector3d{l1 + l2 + l3 + l4 , 0.0, h1 + h2 + h3 });
-
+        Eigen::Vector3d{l1 + l2 + l3 + l4 , 0.0, h1 + h2}); //removed h3 but works with old one if you wanna see aleksander
     Simulation::JointLimits limits
     {
         utility::to_eigen_vectord(std::vector<double>{180.0, 180.0, 180.0, 360.0, 360.0, 360.0}) * utility::deg_to_rad,
@@ -100,12 +106,26 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
     return std::make_shared<ScrewsKinematicsSolver>(
         m,
         std::vector<Eigen::VectorXd>{
-                    utility::screw_axis({0.0, 0.0, h1}, {0.0, 0.0, 1.0}, 0.0),
+                    /*utility::screw_axis({0.0, 0.0, h1}, {0.0, 0.0, 1.0}, 0.0),
                     utility::screw_axis({l1, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
                     utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
                     utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0),
                     utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {0.0, 1.0, 0.0}, 0.0),
-                    utility::screw_axis({l1 + l2 + l3, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0)
+                    utility::screw_axis({l1 + l2 + l3, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0)*/
+            //Den over er og
+            /*utility::screw_axis({0.0, 0.0, h1}, {0.0, 0.0, 1.0}, 0.0),
+            utility::screw_axis({l1, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2 + l3, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0)*/
+//OVER IS THE OLD SCREW WHICH WORKS WITH THE OLD TRAC IK. I HAD TO REMAKE THIS BECAUSE I HAD TO EDIT TRAC IK TO MAKE 3C WORK.
+            utility::screw_axis({l1, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0),
+            utility::screw_axis({l1, 0.0, h1}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2, l3, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2 + l3 + l4, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0)
                 }, limits
     );
 
@@ -116,16 +136,24 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
 inline std::shared_ptr<TracIkKinematicsSolver> hardcoded_kr6r_tracik_solver()
 {
 
+    //These are in meters (OLD)
+    //double l1 = 0.025;
+    //double l2 = 0.455;
+    //double l3 = 0.420;
+    //double l4 = 0.080;
+    //double h1 = 0.200;
+    //double h2 = 0.200;
+    //double h3 = 0.035;
+
     //These are in meters
     double l1 = 0.025;
     double l2 = 0.455;
     double l3 = 0.420;
     double l4 = 0.080;
     double h1 = 0.400;
-    //double h2 = 0.200;
-    double h2 = 0.035;//var h3
+    double h2 = 0.035;
 
-    auto c = std::make_shared<KDL::Chain>();
+    auto c = std::make_shared<KDL::Chain>(); //Had to change this because 3c would not work. But all of 2 worked with the old screw robot code.
     /*c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::Fixed), KDL::Frame(KDL::Vector(0.0, 0.0, h1))));
     c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotZ), KDL::Frame(KDL::Vector(l1, 0.0, h2))));
     c->addSegment(KDL::Segment(KDL::Joint(KDL::Joint::JointType::RotY), KDL::Frame(KDL::Vector(l2, 0.0, 0.0))));
