@@ -28,7 +28,7 @@ namespace AIS4104::utility {
         Eigen::Vector3d eulerZYX(alfa, beta, gamma);
         return eulerZYX;
     }
-
+//Equation (3.30) page 75, MR pre-print 2019 digital
     Eigen::Matrix3d skew_symmetric(const Eigen::Vector3d &v)
     {
         Eigen::Matrix3d S;
@@ -57,7 +57,7 @@ namespace AIS4104::utility {
 
         return Ad;
     }
-
+    // Referanse: digital MR Eq. (3.20) page 98
     Eigen::MatrixXd adjoint_matrix(const Eigen::Matrix4d &tf)
     {
         Eigen::Matrix3d R = tf.block<3,3>(0,0);
@@ -81,7 +81,7 @@ namespace AIS4104::utility {
 
         return transformed_twist;
     }
-
+    //(3.70) side 96 * digital
     Eigen::VectorXd twist(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
     {
         Eigen::VectorXd V(6);
@@ -134,7 +134,7 @@ namespace AIS4104::utility {
         S << s, v;
         return S;
     }
-
+    //henta fra side 82 formel (3.51) digital
     Eigen::Matrix3d matrix_exponential(const Eigen::Vector3d &w, double theta)
     {
         double rad = theta;
@@ -270,7 +270,7 @@ namespace AIS4104::utility {
 
         return matrix;
     }
-
+    //Equation found in page 72, MR pre-print 2019 digital
     Eigen::Matrix3d rotate_y(double radians)
     {
         Eigen::Matrix3d matrix;
@@ -281,7 +281,7 @@ namespace AIS4104::utility {
                   -std::sin(theta),  0,  std::cos(theta);
         return matrix;
     }
-
+    //Equation found in page 72, MR pre-print 2019 digital
     Eigen::Matrix3d rotate_z(double radians)
     {
         Eigen::Matrix3d matrix;
@@ -302,6 +302,16 @@ namespace AIS4104::utility {
         Matrix.col(1) = y;
         Matrix.col(2) = z;
         return Matrix;
+
+        /*Eigen::Matrix3d Matrix; skal bytte til denne!!!!!!!!!
+
+        // Side 67, punkt (a): The unit norm condition.
+        Matrix.col(0) = x.normalized();
+        Matrix.col(1) = y.normalized();
+        Matrix.col(2) = z.normalized();*/
+
+        return Matrix;
+
     }
 //SIDE 577 ELLER 580
     Eigen::Matrix3d rotation_matrix_from_euler_zyx(const Eigen::Vector3d &e)
@@ -323,7 +333,7 @@ namespace AIS4104::utility {
     {
         Eigen::Vector3d u = axis.normalized();
         double theta = radians;
-//BRUK OPP IGJEN GAMMEL SKEW
+//BRUK OPP IGJEN GAMMEL SKEW fiks i morgå :)
         Eigen::Matrix3d u_skew;
         u_skew <<     0,   -u.z(),  u.y(),
                    u.z(),      0,  -u.x(),
