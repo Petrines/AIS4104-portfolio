@@ -119,13 +119,13 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
             utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0),
             utility::screw_axis({l1 + l2, 0.0, h1 + h2 + h3}, {0.0, 1.0, 0.0}, 0.0),
             utility::screw_axis({l1 + l2 + l3, 0.0, h1 + h2 + h3}, {1.0, 0.0, 0.0}, 0.0)*/
-//OVER IS THE OLD SCREW WHICH WORKS WITH THE OLD TRAC IK. I HAD TO REMAKE THIS BECAUSE I HAD TO EDIT TRAC IK TO MAKE 3C WORK.
+//OVER IS THE OLD SCREW WHICH WORKS WITH THE OLD TRAC IK. I HAD TO REMAKE THIS BECAUSE I HAD TO EDIT TRAC IK TO MAKE 3C WORK. NEW ONE DOES NOT WORK YET.
             utility::screw_axis({l1, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0),
             utility::screw_axis({l1, 0.0, h1}, {0.0, 1.0, 0.0}, 0.0),
             utility::screw_axis({l1 + l2, 0.0, h1}, {0.0, 1.0, 0.0}, 0.0),
             utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2, l3, h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2 + l3 + l4, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0)
+            utility::screw_axis({l1 + l2 + l3, 0.0,  h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
+            utility::screw_axis({l1 + l2 + l3 +l4, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0)
                 }, limits
     );
 
