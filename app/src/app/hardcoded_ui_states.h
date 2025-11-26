@@ -24,12 +24,12 @@ inline Visualization::TrajectoryLoggerWindow::State default_logger_state()
 inline Eigen::VectorXd initial_robot_configuration()
 {
     Eigen::VectorXd config(6);
-    config << 0.0, -45.0, 90.0, -90.0, -90.0, 60.0;
-    //config << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+    //config << 0.0, -45.0, 90.0, -90.0, -90.0, 60.0;
+    config << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     return config * utility::deg_to_rad;
 }
 
-//TASK: Default tool configuration:
+//FINISHED: Default tool configuration:
 // a) FIN Set the default value of the orientation of the 3D model (adapter + humerus) to render correctly on the flange.
 // b) (3c) Set the default value of the frame transformation from the flange to the humeral rotation center.
 // (The humerus must face the glenoid for the identity orientation.)
