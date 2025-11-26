@@ -43,7 +43,7 @@ Eigen::Matrix4d ScrewsKinematicsSolver::fk_solve(const Eigen::VectorXd &joint_po
 
         Eigen::Matrix4d T_i = utility::matrix_exponential(screw, theta);
 
-        T = T * T_i;
+      T *= T_i;
     }
 
     T = T * M;
@@ -56,7 +56,7 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
 {
     return ik_solve(t_sd, j0, [&](const std::vector<Eigen::VectorXd> &) { return 0u; });
 }
-
+//assigmnet 3.4a men altså den under e teit så bør kanskje endre den
 //FINISHED: Implement ik_solve using screws.
 Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd &j0, const std::function<uint32_t(const std::vector<Eigen::VectorXd> &)> &solution_selector)
 {
@@ -121,7 +121,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
     }
     return {M_body, B_body};
 }
-
+//altså du må gi meg feedback på assigmnet 3 side 178 kanskje
 //FINISHED: Implement space_jacobian() using space_chain()
 Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
@@ -132,7 +132,7 @@ Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &cu
 
     Eigen::Matrix4d T_i_minus_1 = Eigen::Matrix4d::Identity();
 
-    for (uint32_t i = 0; i < n; ++i)
+    for (uint32_t i = 0; i < n; ++i) //kunne brukt 8
     {
         const Eigen::VectorXd S_i = S[i];
         double theta_i = current_joint_positions[i];

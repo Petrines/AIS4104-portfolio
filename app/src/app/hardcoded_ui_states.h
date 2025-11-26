@@ -24,8 +24,8 @@ inline Visualization::TrajectoryLoggerWindow::State default_logger_state()
 inline Eigen::VectorXd initial_robot_configuration()
 {
     Eigen::VectorXd config(6);
-    //config << 0.0, -45.0, 90.0, -90.0, -90.0, 60.0;
-    config << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+    config << 0.0, -45.0, 90.0, -90.0, -90.0, 60.0;
+    //config << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     return config * utility::deg_to_rad;
 }
 

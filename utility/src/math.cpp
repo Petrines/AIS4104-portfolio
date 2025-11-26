@@ -140,7 +140,7 @@ namespace AIS4104::utility {
         Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin(rad) * skew_symmetric(w) + (1-cos(rad)) * skew_symmetric(w) * skew_symmetric(w);
         return R;
     }
-
+//mangla if statement på side 104
     Eigen::Matrix4d matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta)
     {
         double rad = theta;
@@ -159,7 +159,7 @@ namespace AIS4104::utility {
         Eigen::Matrix4d T = matrix_exponential(w, v, theta);
         return T;
     }
-
+//side 85-86 algoritme
     std::pair<Eigen::Vector3d, double> matrix_logarithm(const Eigen::Matrix3d &r)
     {
         double theta;
@@ -257,7 +257,7 @@ namespace AIS4104::utility {
         //return std::make_pair(Eigen::VectorXd::Zero(6),0);
 
     }
-
+//side 72 kanskje
     Eigen::Matrix3d rotate_x(double radians)
     {
         Eigen::Matrix3d matrix;
@@ -293,7 +293,7 @@ namespace AIS4104::utility {
 
         return matrix;
     }
-
+//side 67 MÅ NORMALISERES SKAL BLI ENHETSROTASJON
     Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x, const Eigen::Vector3d &y, const Eigen::Vector3d &z)
     {
         Eigen::Matrix3d Matrix;
@@ -302,7 +302,7 @@ namespace AIS4104::utility {
         Matrix.col(2) = z;
         return Matrix;
     }
-
+//SIDE 577 ELLER 580
     Eigen::Matrix3d rotation_matrix_from_euler_zyx(const Eigen::Vector3d &e)
     {
         double alpha = e(0); // rotasjon om z
@@ -317,12 +317,12 @@ namespace AIS4104::utility {
         Eigen::Matrix3d R = Eigen::Matrix3d::Identity() * Rz * Ry * Rx;  // rekkefølgen Z * Y * X
         return R;
     }
-
+//RODRIGERS FORMEL SIDE 82
     Eigen::Matrix3d rotation_matrix_from_axis_angle(const Eigen::Vector3d &axis, double radians)
     {
         Eigen::Vector3d u = axis.normalized();
         double theta = radians;
-
+//BRUK OPP IGJEN GAMMEL SKEW
         Eigen::Matrix3d u_skew;
         u_skew <<     0,   -u.z(),  u.y(),
                    u.z(),      0,  -u.x(),
@@ -342,7 +342,7 @@ namespace AIS4104::utility {
     {
         return tf.block<3,3>(0,0);
     }
-    //new:
+    //new:SIDE 87
     Eigen::Matrix4d transformation_matrix(const Eigen::Vector3d &p)
     {
         Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();

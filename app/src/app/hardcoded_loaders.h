@@ -93,7 +93,8 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
     double h1 = 0.400;
     double h2 = 0.035;
 
-    Eigen::Matrix4d m = utility::transformation_matrix(utility::rotate_y(0 * utility::deg_to_rad) * utility::rotate_x(0 * utility::deg_to_rad) * utility::rotate_z(0 * utility::deg_to_rad),
+    Eigen::Matrix3d R = Eigen::Matrix3d::Identity(); //The line under was commented out but it worked before in the old code of t2
+    Eigen::Matrix4d m = utility::transformation_matrix(R,  //utility::transformation_matrix(utility::rotate_y(0 * utility::deg_to_rad) * utility::rotate_x(0 * utility::deg_to_rad) * utility::rotate_z(0 * utility::deg_to_rad),
         Eigen::Vector3d{l1 + l2 + l3 + l4 , 0.0, h1 + h2}); //removed h3 but works with old one if you wanna see aleksander
     Simulation::JointLimits limits
     {
@@ -125,7 +126,7 @@ inline std::shared_ptr<ScrewsKinematicsSolver> hardcoded_kr6r_screw_solver()
             utility::screw_axis({l1 + l2, 0.0, h1}, {0.0, 1.0, 0.0}, 0.0),
             utility::screw_axis({l1 + l2, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0),
             utility::screw_axis({l1 + l2 + l3, 0.0,  h1 + h2}, {0.0, 1.0, 0.0}, 0.0),
-            utility::screw_axis({l1 + l2 + l3 +l4, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0)
+            utility::screw_axis({l1 + l2 + l3, 0.0, h1 + h2}, {1.0, 0.0, 0.0}, 0.0)
                 }, limits
     );
 
