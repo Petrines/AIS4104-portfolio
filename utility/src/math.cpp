@@ -3,6 +3,7 @@
 #include <numbers>
 
 namespace AIS4104::utility {
+    //
     Eigen::Vector3d euler_zyx_from_rotation_matrix(const Eigen::Matrix3d &r)
     {
         double gamma, beta, alfa;

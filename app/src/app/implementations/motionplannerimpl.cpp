@@ -35,8 +35,13 @@ Eigen::VectorXd MotionPlannerImpl::task_space_screw(const Eigen::Matrix4d &tw_st
 //TASK: Implement jogging in tool frame from the start pose along the displacement and rotation
 Eigen::VectorXd MotionPlannerImpl::tool_frame_displace(const Eigen::Matrix4d &tw_start_pose, const Eigen::Vector3d &tf_offset, const Eigen::Vector3d &tf_zyx)
 {
-    Eigen::Matrix4d pose = tw_start_pose * utility::transformation_matrix(utility::rotation_matrix_from_euler_zyx(tf_zyx), tf_offset);
-    return m_robot.joint_positions();
+
+    Eigen::Matrix4d T_delta = utility::transformation_matrix(utility::rotation_matrix_from_euler_zyx(tf_zyx), tf_offset);
+    Eigen::Matrix4d tw_target_pose = tw_start_pose * T_delta;
+    return m_robot.ik_solve_pose(tw_target_pose, m_robot.joint_positions());
+
+    //Eigen::Matrix4d pose = tw_start_pose * utility::transformation_matrix(utility::rotation_matrix_from_euler_zyx(tf_zyx), tf_offset);
+    //return m_robot.joint_positions();
 }
 
 //TASK: Implement a P2P trajectory generator from the current configuration to the target.
