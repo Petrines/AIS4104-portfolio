@@ -32,17 +32,22 @@ uint8_t RobotWrapper::joint_count() const
     return m_solver->joint_count();
 }
 
-//TASK FIN: Implement the function to calculate the joint positions for the desired tool pose
+//FINISHED: Implement the function to calculate the joint positions for the desired tool pose
 // a) Use m_tool_transform to calculate the flange pose required by m_solver.ik_solve()
 // b) Use the m_solver.ik_solve() overload with the solution selector lambda to choose the most desirable IK solution.
 Eigen::VectorXd RobotWrapper::ik_solve_pose(const Eigen::Matrix4d &eef_pose, const Eigen::VectorXd &j0) const
 {
     //Eigen::Matrix4d flange_pose = eef_pose * m_tool_transform.inverse();
     //return ik_solve_flange_pose(flange_pose,j0);
-//add det ej fjerna?
-
     Eigen::Matrix4d flange_pose = eef_pose * m_tool_transform.inverse();
+    return ik_solve_flange_pose(flange_pose, j0);
+}
 
+//FINISHED: Implement the function to calculate the joint positions for the desired flange pose
+// a) Use m_tool_transform to calculate the flange pose required by m_solver.ik_solve()
+// b) Use the m_solver.ik_solve() overload with the solution selector lambda to choose the most desirable IK solution.
+Eigen::VectorXd RobotWrapper::ik_solve_flange_pose(const Eigen::Matrix4d &flange_pose, const Eigen::VectorXd &j0) const
+{
     auto solution_selector = [&](const std::vector<Eigen::VectorXd>& solutions) -> uint32_t {
 
         if (solutions.empty()) return 0;
@@ -52,7 +57,6 @@ Eigen::VectorXd RobotWrapper::ik_solve_pose(const Eigen::Matrix4d &eef_pose, con
 
         for (uint32_t i = 0; i < solutions.size(); ++i)
         {
-
             double diff = (solutions[i] - j0).norm();
 
             if (diff < min_diff)
@@ -65,14 +69,7 @@ Eigen::VectorXd RobotWrapper::ik_solve_pose(const Eigen::Matrix4d &eef_pose, con
     };
 
     return m_solver->ik_solve(flange_pose, j0, solution_selector);
-}
-
-//FINISHED: Implement the function to calculate the joint positions for the desired flange pose
-// a) Use m_tool_transform to calculate the flange pose required by m_solver.ik_solve()
-// b) Use the m_solver.ik_solve() overload with the solution selector lambda to choose the most desirable IK solution.
-Eigen::VectorXd RobotWrapper::ik_solve_flange_pose(const Eigen::Matrix4d &flange_pose, const Eigen::VectorXd &j0) const
-{
-    return m_solver->ik_solve(flange_pose, j0);
+    //return m_solver->ik_solve(flange_pose, j0);
     //return joint_positions();
 }
 
@@ -86,7 +83,7 @@ void RobotWrapper::set_tool_transform(Eigen::Matrix4d transform)
     m_tool_transform = std::move(transform);
 }
 
-//TASK FIN: Calculate the pose of the end effector using forward kinematics;
+//FINISHED: Calculate the pose of the end effector using forward kinematics;
 // Relevant variables are m_solver and m_tool_transform.
 Eigen::Matrix4d RobotWrapper::current_pose() const
 {
@@ -95,7 +92,7 @@ Eigen::Matrix4d RobotWrapper::current_pose() const
     //return Eigen::Matrix4d::Identity();
 }
 
-//TASK FIN: Calculate the position of the end effector using forward kinematics.
+//FINISHED: Calculate the position of the end effector using forward kinematics.
 // Relevant variables are m_solver and m_tool_transform (or possibly another function of RobotWrapper?).
 Eigen::Vector3d RobotWrapper::current_position() const
 {
@@ -104,7 +101,7 @@ Eigen::Vector3d RobotWrapper::current_position() const
     //return Eigen::Vector3d::Zero();
 }
 
-//TASK FIN: Calculate the orientation of the end effector using forward kinematics and m_solver (or rely on another function of RobotWrapper?).
+//FINISHED: Calculate the orientation of the end effector using forward kinematics and m_solver (or rely on another function of RobotWrapper?).
 Eigen::Vector3d RobotWrapper::current_orientation_zyx() const
 {
     Eigen::Matrix4d T = current_pose();

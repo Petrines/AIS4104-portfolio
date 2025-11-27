@@ -25,14 +25,20 @@ Eigen::VectorXd MotionPlannerImpl::task_space_pose(const Eigen::Matrix4d &pose)
     return m_robot.ik_solve_pose(pose, m_robot.joint_positions());
 }
 
-//TASK: Implement a function that calculates the pose of the given screw, and solves the IK to obtain the joint positions
+//FINISHED: Implement a function that calculates the pose of the given screw, and solves the IK to obtain the joint positions
 Eigen::VectorXd MotionPlannerImpl::task_space_screw(const Eigen::Matrix4d &tw_start_pose, const Eigen::Vector3d &w, const Eigen::Vector3d &q, double theta, double h)
 {
-    std::cout << "MotionPlannerImpl::task_space_screw:" << std::endl << w.transpose() << std::endl << q.transpose() << std::endl << theta << std::endl << h << std::endl << std::endl;
-    return m_robot.joint_positions();
+    Eigen::VectorXd S = utility::screw_axis(q, w, h);
+    Eigen::Matrix4d T_motion = utility::matrix_exponential(S, theta);
+    Eigen::Matrix4d tw_target_pose = T_motion * tw_start_pose;
+
+    return m_robot.ik_solve_pose(tw_target_pose, m_robot.joint_positions());
+//
+    //std::cout << "MotionPlannerImpl::task_space_screw:" << std::endl << w.transpose() << std::endl << q.transpose() << std::endl << theta << std::endl << h << std::endl << std::endl;
+    //return m_robot.joint_positions();
 }
 
-//TASK: Implement jogging in tool frame from the start pose along the displacement and rotation
+//FINISHED: Implement jogging in tool frame from the start pose along the displacement and rotation
 Eigen::VectorXd MotionPlannerImpl::tool_frame_displace(const Eigen::Matrix4d &tw_start_pose, const Eigen::Vector3d &tf_offset, const Eigen::Vector3d &tf_zyx)
 {
 
