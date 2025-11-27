@@ -16,6 +16,8 @@ add_executable(app
     src/app/examples/tracikkinematicssolver.cpp
     src/app/examples/ptplinetrajectorygeneratorexample.h
     src/app/examples/ptplinetrajectorygeneratorexample.cpp
+        src/app/implementations/CubicPTPTrajectoryGenerator.cpp
+        src/app/implementations/CubicPTPTrajectoryGenerator.h
 )
 
 target_pedantic_build(app)
