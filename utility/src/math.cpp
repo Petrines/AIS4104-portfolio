@@ -3,7 +3,9 @@
 #include <numbers>
 
 namespace AIS4104::utility {
-    //
+    //Equation (x) page x, MR pre-print 2019 digital
+    //Page X MR physical book Equation (X)
+    //Page 577, MR pre-print 2019 digital
     Eigen::Vector3d euler_zyx_from_rotation_matrix(const Eigen::Matrix3d &r)
     {
         double gamma, beta, alfa;
@@ -44,7 +46,7 @@ namespace AIS4104::utility {
         v << m(2,1), m(0,2), m(1,0);
         return v;
     }
-    //new: page 85 MR physical book
+    //new: Equation (3.20) page 98, MR pre-print 2019 digital
     Eigen::MatrixXd adjoint_matrix(const Eigen::Matrix3d &r, const Eigen::Vector3d &p)
     {
         Eigen::Matrix3d p_hat=skew_symmetric(p);
@@ -57,7 +59,7 @@ namespace AIS4104::utility {
 
         return Ad;
     }
-    // Referanse: digital MR Eq. (3.20) page 98
+    //Equation (3.20) page 98, MR pre-print 2019 digital
     Eigen::MatrixXd adjoint_matrix(const Eigen::Matrix4d &tf)
     {
         Eigen::Matrix3d R = tf.block<3,3>(0,0);
@@ -73,7 +75,7 @@ namespace AIS4104::utility {
 
         return AdT;
     }
-    //new: page 85 MR physical book
+    //Equation (3.20) page 98, MR pre-print 2019 digital
     Eigen::VectorXd adjoint_map(const Eigen::VectorXd &twist, const Eigen::Matrix4d &tf)
     {
         Eigen::MatrixXd Ad_g = adjoint_matrix(tf);
@@ -81,14 +83,14 @@ namespace AIS4104::utility {
 
         return transformed_twist;
     }
-    //(3.70) side 96 * digital
+    //Equation (3.70) page 96, MR pre-print 2019 digital
     Eigen::VectorXd twist(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
     {
         Eigen::VectorXd V(6);
         V << w, v;
         return V;
     }
-    //new: page 87 MR physical book
+    //new: Page 87 MR physical book
     Eigen::VectorXd twist(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h, double angular_velocity)
     {
         double dot_theta = angular_velocity;
@@ -126,7 +128,7 @@ namespace AIS4104::utility {
         S << w, v;
         return S;
     }
-    // Referanse:DIGITAL MR formula on page 102
+    //Page 102, MR pre-print 2019 digital
     Eigen::VectorXd screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
     {
         Eigen::VectorXd S(6);
@@ -134,25 +136,33 @@ namespace AIS4104::utility {
         S << s, v;
         return S;
     }
-    //henta fra side 82 formel (3.51) digital
+    //Equation (3.51) page 82, MR pre-print 2019 digital
     Eigen::Matrix3d matrix_exponential(const Eigen::Vector3d &w, double theta)
     {
         double rad = theta;
         Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin(rad) * skew_symmetric(w) + (1-cos(rad)) * skew_symmetric(w) * skew_symmetric(w);
         return R;
     }
-//mangla if statement på side 104
+    //Equation (3.25) page 103, MR pre-print 2019 digital
     Eigen::Matrix4d matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta)
     {
-        double rad = theta;
-
-        Eigen::Matrix3d R = matrix_exponential(w, theta); //fra 3a
-        Eigen::Vector3d v_theta = ((Eigen::Matrix3d::Identity() * rad) + ((1-cos(rad)) * skew_symmetric(w)) + (rad - sin(rad)) * skew_symmetric(w) * skew_symmetric(w)) * v;
-
-        Eigen::Matrix4d T = transformation_matrix(R, v_theta);
-        return T;
+        if (w.norm() < 1e-6)
+        {
+            return transformation_matrix(Eigen::Matrix3d::Identity(), v * theta);
+        }
+        else
+        {
+            double rad = theta;
+            Eigen::Matrix3d w_skew = skew_symmetric(w);
+            Eigen::Matrix3d R = matrix_exponential(w, theta);
+            Eigen::Matrix3d G = (Eigen::Matrix3d::Identity() * rad) +
+                                ((1 - cos(rad)) * w_skew) +
+                                ((rad - sin(rad)) * (w_skew * w_skew));
+            Eigen::Vector3d v_theta = G * v;
+            return transformation_matrix(R, v_theta);
+        }
     }
-    //new ana ikkje kor fomelen e
+    //new: Equation (3.25) page 103, MR pre-print 2019 digital
     Eigen::Matrix4d matrix_exponential(const Eigen::VectorXd &screw, double theta)
     {
         Eigen::Vector3d w = screw.segment<3>(0);
@@ -160,7 +170,7 @@ namespace AIS4104::utility {
         Eigen::Matrix4d T = matrix_exponential(w, v, theta);
         return T;
     }
-//side 85-86 algoritme
+    //Algorithm page 85 and 86, MR pre-print 2019 digital
     std::pair<Eigen::Vector3d, double> matrix_logarithm(const Eigen::Matrix3d &r)
     {
         double theta;
@@ -232,6 +242,7 @@ namespace AIS4104::utility {
         return 1 / (std::sin(x) / std::cos(x)); // fordi tan = sin/cos
     }
     //--> note to self:Is also from assignment 2
+    //new: page 90 MR physical book Algorithm on this page
     std::pair<Eigen::VectorXd, double> matrix_logarithm(const Eigen::Matrix4d &tf)
     {
         const Eigen::Matrix3d R = tf.topLeftCorner<3,3>();
@@ -258,7 +269,8 @@ namespace AIS4104::utility {
         //return std::make_pair(Eigen::VectorXd::Zero(6),0);
 
     }
-//side 72 kanskje
+
+    //Equation found in page 72, MR pre-print 2019 digital
     Eigen::Matrix3d rotate_x(double radians)
     {
         Eigen::Matrix3d matrix;
@@ -294,26 +306,19 @@ namespace AIS4104::utility {
 
         return matrix;
     }
-//side 67 MÅ NORMALISERES SKAL BLI ENHETSROTASJON
+    //Found in page 67, MR pre-print 2019 digital
     Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x, const Eigen::Vector3d &y, const Eigen::Vector3d &z)
     {
+
         Eigen::Matrix3d Matrix;
-        Matrix.col(0) = x;
-        Matrix.col(1) = y;
-        Matrix.col(2) = z;
-        return Matrix;
 
-        /*Eigen::Matrix3d Matrix; skal bytte til denne!!!!!!!!!
-
-        // Side 67, punkt (a): The unit norm condition.
         Matrix.col(0) = x.normalized();
         Matrix.col(1) = y.normalized();
-        Matrix.col(2) = z.normalized();*/
+        Matrix.col(2) = z.normalized();
 
         return Matrix;
-
     }
-//SIDE 577 ELLER 580
+    //Found in page 577, MR pre-print 2019 digital
     Eigen::Matrix3d rotation_matrix_from_euler_zyx(const Eigen::Vector3d &e)
     {
         double alpha = e(0); // rotasjon om z
@@ -328,16 +333,13 @@ namespace AIS4104::utility {
         Eigen::Matrix3d R = Eigen::Matrix3d::Identity() * Rz * Ry * Rx;  // rekkefølgen Z * Y * X
         return R;
     }
-//RODRIGERS FORMEL SIDE 82
+    //Equation (3.51) page 82, MR pre-print 2019 digital
     Eigen::Matrix3d rotation_matrix_from_axis_angle(const Eigen::Vector3d &axis, double radians)
     {
         Eigen::Vector3d u = axis.normalized();
         double theta = radians;
-//BRUK OPP IGJEN GAMMEL SKEW fiks i morgå :)
-        Eigen::Matrix3d u_skew;
-        u_skew <<     0,   -u.z(),  u.y(),
-                   u.z(),      0,  -u.x(),
-                  -u.y(),   u.x(),     0;
+
+        Eigen::Matrix3d u_skew = skew_symmetric(u);
 
         // Rodrigues rotasjonsformel
         Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
@@ -348,26 +350,26 @@ namespace AIS4104::utility {
 
         return matrix;
     }
-    //new:
+    //new: Page 87, MR pre-print 2019 digital
     Eigen::Matrix3d rotation_matrix(const Eigen::Matrix4d &tf)
     {
         return tf.block<3,3>(0,0);
     }
-    //new:SIDE 87
+    //new: Page 87, MR pre-print 2019 digital
     Eigen::Matrix4d transformation_matrix(const Eigen::Vector3d &p)
     {
         Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();
         matrix.block<3,1>(0,3) = p;
         return matrix;
     }
-    //new:
+    //new: Page 87, MR pre-print 2019 digital
     Eigen::Matrix4d transformation_matrix(const Eigen::Matrix3d &r)
     {
         Eigen::Matrix4d matrix = Eigen::Matrix4d::Identity();
         matrix.block<3,3>(0,0) = r;
         return matrix;
     }
-
+    //new: Page 87, MR pre-print 2019 digital
     Eigen::Matrix4d transformation_matrix(const Eigen::Matrix3d &r, const Eigen::Vector3d &p)
     {
         Eigen::Matrix4d T = Eigen::Matrix4d::Identity();
