@@ -56,15 +56,11 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
 {
     return ik_solve(t_sd, j0, [&](const std::vector<Eigen::VectorXd> &) { return 0u; });
 }
-//assigmnet 3.4a men altså den under e teit så bør kanskje endre den
+//assigmnet 3.4a men her e den endra
 //FINISHED: Implement ik_solve using screws.
 Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd &j0, const std::function<uint32_t(const std::vector<Eigen::VectorXd> &)> &solution_selector)
 {
     const int MAX_ITER = 20;
-
-    const double WE_TOL = m_we;
-    const double VE_TOL = m_ve;
-
     Eigen::VectorXd current_joints = j0;
 
     for (int iter = 0; iter < MAX_ITER; ++iter)
@@ -72,26 +68,18 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
         Eigen::Matrix4d T_sb = fk_solve(current_joints);
         Eigen::Matrix4d T_bs = T_sb.inverse();
         Eigen::Matrix4d T_bd = T_bs * t_sd;
+
         auto log_T_pair = utility::matrix_logarithm(T_bd);
-        Eigen::VectorXd S_e = log_T_pair.first;
-        double theta_e = log_T_pair.second;
-
-        Eigen::VectorXd V_e = S_e * theta_e;
-        double w_error = V_e.head<3>().norm();
-        double v_error = V_e.tail<3>().norm();
-
-        if (w_error < WE_TOL && v_error < VE_TOL)
+        Eigen::VectorXd V_e = log_T_pair.first * log_T_pair.second;
+        if (V_e.head<3>().norm() < m_we && V_e.tail<3>().norm() < m_ve)
         {
             return current_joints;
         }
-        Eigen::MatrixXd Jb = body_jacobian(current_joints);
-        Eigen::JacobiSVD<Eigen::MatrixXd> svd(Jb, Eigen::ComputeThinU | Eigen::ComputeThinV);
-        Eigen::VectorXd singular_values = svd.singularValues();
-        double tolerance = std::numeric_limits<double>::epsilon() * std::max(Jb.rows(), Jb.cols()) * singular_values.array().abs().maxCoeff();
-        Eigen::VectorXd singular_values_inv = (singular_values.array() > tolerance).select(singular_values.array().inverse(), 0.0);
+        Eigen::MatrixXd Js = space_jacobian(current_joints);
+        Eigen::MatrixXd Ad_T_bs = utility::adjoint_matrix(T_bs);
+        Eigen::MatrixXd Jb = Ad_T_bs * Js;
+        Eigen::VectorXd Delta_theta = Jb.completeOrthogonalDecomposition().solve(V_e);
 
-        Eigen::MatrixXd Jb_dagger = svd.matrixV() * singular_values_inv.asDiagonal() * svd.matrixU().transpose();
-        Eigen::VectorXd Delta_theta = Jb_dagger * V_e;
         current_joints += Delta_theta;
     }
 
@@ -121,7 +109,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
     }
     return {M_body, B_body};
 }
-//altså du må gi meg feedback på assigmnet 3 side 178 kanskje
+//uten feedback på assigmnet 3 side 178
 //FINISHED: Implement space_jacobian() using space_chain()
 Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
